@@ -7,7 +7,7 @@ router.post('/print-bill', printBill);
 async function printBill(data) {
   const requestBody = data.body
   for (const bill of requestBody) {
-    bill.today = new Date().toISOString().replace('T',' ') 
+    bill.today = new Date().toISOString().replace('T',' ').slice(0,19) 
     sendPrinter(bill)
   }
  
@@ -43,10 +43,15 @@ async function sendPrinter(data) {
         PRINTER.println(data.title)
         PRINTER.newLine()
         PRINTER.setTextNormal()
-        PRINTER.bold()
+        
         PRINTER.alignLeft()
-        PRINTER.println('Хvргэх хаяг: ' + data.address.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'),)
-        PRINTER.println('Нэмэлт мэдээлэл: ' + data.description.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'),)
+        PRINTER.print(data.billType)
+        PRINTER.bold()
+        // PRINTER.println('Bill type: ' + data.address.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'),)
+        PRINTER.println('Хоол авах цаг: ' + data.schedule ? data.schedule : "=")
+        PRINTER.println('Хэрэглэгчийн утас: ' + data.phone)
+        PRINTER.println('Хvргэх хаяг: ' + data.address.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'))
+        PRINTER.println('Нэмэлт мэдээлэл: ' + data.description.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'))
         PRINTER.newLine()
         PRINTER.println('Огноо: ' + data.today)
         PRINTER.newLine()
@@ -63,8 +68,8 @@ async function sendPrinter(data) {
         PRINTER.println('Нийт vнэ: ' + data.totalAmount)
         PRINTER.newLine()
         PRINTER.printQR(data.title, { cellSize: 8, correction: 'Q', model: 2})
-        PRINTER.setTextNormal()
-        PRINTER.print(data.title)
+        // PRINTER.setTextNormal()
+        PRINTER.print(data.billType)
         PRINTER.beep()
         PRINTER.cut()
     
