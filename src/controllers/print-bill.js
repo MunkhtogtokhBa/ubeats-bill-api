@@ -7,10 +7,15 @@ router.post('/print-bill', printBill)
 
 async function printBill ({ decode, res }) {
   const requestBody = decode
-  for (const bill of requestBody) {
-    bill.today = new Date().toISOString().replace('T', ' ').slice(0, 19)
-    await sendPrinter(bill)
+  try {
+    for (const bill of requestBody) {
+      bill.today = new Date().toISOString().replace('T', ' ').slice(0, 19)
+      await sendPrinter(bill)
+    }
+  } catch (err) {
+    logger.log('error', err)
   }
+
   // console.log('Print bill body: ', requestBody)
   return res.status(200).json({ result: signData('Printer done') })
 }
