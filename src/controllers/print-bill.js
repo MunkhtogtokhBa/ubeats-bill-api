@@ -14,6 +14,7 @@ async function printBill ({ decode, res }) {
     }
   } catch (err) {
     logger.log('error', err)
+    throw err
   }
 
   // console.log('Print bill body: ', requestBody)
