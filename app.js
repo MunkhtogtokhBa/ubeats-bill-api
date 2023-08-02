@@ -4,13 +4,21 @@ const cors = require('cors')
 const printBill = require('./src/controllers/print-bill')
 const { secure } = require('./src/midleware/security')
 const errorHandler = require('./src/midleware/errorHandler')
+const logger = require('./src/util/logger')
 const app = express()
 const port = 3000
 
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-
+app.use((req, res, next) => {
+  // console.log(req)
+  logger.log({
+    level: 'info',
+    message: req.originalUrl
+  })
+  next()
+})
 app.use('/ubeats', secure, printBill)
 app.get('/ping', (req, res) => {
   res.send('pong')

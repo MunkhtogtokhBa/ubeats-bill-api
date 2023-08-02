@@ -21,6 +21,13 @@ const logger = createLogger({
     // new transports:
     new transports.File({
       filename: `logs/${fileName()}.log`
+    }),
+    new transports.Console({
+      level: 'info',
+      format: format.combine(
+        format.colorize(),
+        format.simple()
+      )
     })
   ]
   // ...
