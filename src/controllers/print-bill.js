@@ -14,7 +14,8 @@ async function printBill ({ decode, res }) {
     }
   } catch (err) {
     logger.log('error', err)
-    throw err
+    // throw err
+    return res.status(200).json({ result: signData(err) })  
   }
 
   // console.log('Print bill body: ', requestBody)
