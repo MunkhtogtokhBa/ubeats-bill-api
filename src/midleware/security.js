@@ -43,7 +43,20 @@ function getEncryptionKey (key, length = 32) {
   }
   return key.substr(0, length)
 }
-
+function decodTest (req, res) {
+  const { data } = req.body
+  console.log('Decode data: ', data)
+  let decodedData = decrypt256ctr(data, SIGN_SECRET.slice(0, 32))
+  decodedData = JSON.parse(decodedData)
+  // console.log('Decode data: ', typeof decodedData)
+  return res.status(200).json({ result: JSON.parse(decodedData) })
+}
+function encodTest (req, res) {
+  const data = req.body
+  console.log('Encode data: ', req.body)
+  const encodedData = signData(JSON.stringify(data), SIGN_SECRET.slice(0, 32))
+  return res.status(200).json({ data: encodedData })
+}
 function secure (req, res, next) {
   const { data } = req.body
   //   console.log('Req: ', req)
@@ -56,4 +69,4 @@ function signData (data) {
   return encrypt256ctr(JSON.stringify(data), SIGN_SECRET.slice(0, 32))
 }
 
-module.exports = { secure, signData }
+module.exports = { secure, signData, decodTest, encodTest }

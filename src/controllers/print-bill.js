@@ -6,7 +6,8 @@ const { signData } = require('../midleware/security')
 router.post('/print-bill', printBill)
 
 async function printBill ({ decode, res }) {
-  const requestBody = decode
+  const requestBody = JSON.parse(decode)
+  console.log('Req body type: ', typeof requestBody)
   try {
     for (const bill of requestBody) {
       bill.today = new Date().toISOString().replace('T', ' ').slice(0, 19)
@@ -15,7 +16,7 @@ async function printBill ({ decode, res }) {
   } catch (err) {
     logger.log('error', err)
     // throw err
-    return res.status(200).json({ result: signData(err) })
+    return res.status(200).json({ result: err })
   }
 
   // console.log('Print bill body: ', requestBody)
