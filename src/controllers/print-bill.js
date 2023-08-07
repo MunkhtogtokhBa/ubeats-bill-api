@@ -11,9 +11,9 @@ async function printBill ({ decode, res }) {
   console.log('Req body type: ', typeof requestBody)
   try {
     for (const bill of requestBody) {
-      bill.today = new Date()
-      bill.today.setTime(bill.today.getTime() + eigthHoursInMill)
-      bill.today.toISOString().replace('T', ' ').slice(0, 19)
+      const today = new Date()
+      today.setTime(bill.today.getTime() + eigthHoursInMill)
+      bill.today = today.toISOString().replace('T', ' ').slice(0, 19)
       await sendPrinter(bill)
     }
   } catch (err) {
