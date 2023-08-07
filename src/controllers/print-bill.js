@@ -28,9 +28,10 @@ async function printBill ({ decode, res }) {
 
 async function sendPrinter (data) {
   logger.log('debug', 'Print bill function called')
+  const printerInterface = '//localhost/' + process.env.PRINTER_INTERFACE || 'SLK-TS400'
   const PRINTER = new ThermalPrinter({
     type: PrinterTypes.EPSON, // Printer type: 'star' or 'epson'
-    interface: '//localhost/SLK-TS400',
+    interface: printerInterface,
     width: 42,
     // driver: require('printer'),                   // Printer interface
     characterSet: CharacterSet.PC866_CYRILLIC2, // Printer character set - default: SLOVENIA
