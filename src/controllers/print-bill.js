@@ -6,11 +6,14 @@ const { signData } = require('../midleware/security')
 router.post('/print-bill', printBill)
 
 async function printBill ({ decode, res }) {
+  const eigthHoursInMill = 8 * 60 * 60 * 1000
   const requestBody = JSON.parse(decode)
   console.log('Req body type: ', typeof requestBody)
   try {
     for (const bill of requestBody) {
-      bill.today = new Date().toISOString().replace('T', ' ').slice(0, 19)
+      bill.today = new Date()
+      bill.today.setTime(bill.today.getTime() + eigthHoursInMill)
+      bill.today.toISOString().replace('T', ' ').slice(0, 19)
       await sendPrinter(bill)
     }
   } catch (err) {
@@ -65,17 +68,17 @@ async function sendPrinter (data) {
     PRINTER.println('Огноо: ' + data.today)
     PRINTER.newLine()
     PRINTER.drawLine()
-
+    PRINTER.setTextQuadArea()
     for (const item of data.items) {
       PRINTER.leftRight(item.name.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'), item.qty)
     }
 
     PRINTER.drawLine()
-    PRINTER.setTextQuadArea()
+
     PRINTER.println('Нийт хоол: ' + data.totalItems)
     PRINTER.newLine()
-    PRINTER.println('Нийт vнэ: ' + data.totalAmount)
-    PRINTER.newLine()
+    // PRINTER.println('Нийт vнэ: ' + data.totalAmount)
+    // PRINTER.newLine()
     PRINTER.printQR(data.title, { cellSize: 8, correction: 'Q', model: 2 })
     // PRINTER.setTextNormal()
     PRINTER.print(data.billType)
