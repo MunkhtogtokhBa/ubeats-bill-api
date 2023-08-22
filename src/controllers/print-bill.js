@@ -33,7 +33,7 @@ async function kitchenBill ({ decode, res }) {
   try {
     for (const bill of requestBody) {
       const today = new Date()
-      today.setTime(bill.today.getTime() + eigthHoursInMill)
+      today.setTime(today.getTime() + eigthHoursInMill)
       bill.today = today.toISOString().replace('T', ' ').slice(0, 19)
       await sendKitchenPrint(bill)
     }
