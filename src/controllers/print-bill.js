@@ -82,7 +82,7 @@ async function sendPrinter (data) {
     PRINTER.print(data.billType)
     PRINTER.bold()
     // PRINTER.println('Bill type: ' + data.address.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'),)
-    PRINTER.println('Хоол авах цаг: ' + data.schedule ? data.schedule : '=')
+    PRINTER.println('Хоол авах цаг: ' + (data.schedule ? data.schedule : '='))
     PRINTER.println('Хэрэглэгчийн утас: ' + data.phone)
     PRINTER.println('Хvргэх хаяг: ' + data.address.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'))
     PRINTER.println('Нэмэлт мэдээлэл: ' + data.description.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'))
@@ -90,11 +90,11 @@ async function sendPrinter (data) {
     PRINTER.println('Огноо: ' + data.today)
     PRINTER.newLine()
     PRINTER.drawLine()
-
+    PRINTER.setTextQuadArea()
     for (const item of data.items) {
       PRINTER.leftRight(item.name.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'), item.qty)
     }
-
+    PRINTER.setTextNormal()
     PRINTER.drawLine()
     PRINTER.setTextQuadArea()
     PRINTER.println('Нийт хоол: ' + data.totalItems)
