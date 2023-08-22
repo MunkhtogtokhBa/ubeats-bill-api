@@ -3,10 +3,11 @@ const { ThermalPrinter, PrinterTypes, CharacterSet, BreakLine } = require('node-
 const logger = require('../util/logger')
 const { signData } = require('../midleware/security')
 
+const eigthHoursInMill = 8 * 60 * 60 * 1000
 router.post('/print-bill', printBill)
+router.post('/kitchen-bill', kitchenBill)
 
 async function printBill ({ decode, res }) {
-  const eigthHoursInMill = 8 * 60 * 60 * 1000
   const requestBody = JSON.parse(decode)
   console.log('Req body type: ', typeof requestBody)
   try {
@@ -23,6 +24,24 @@ async function printBill ({ decode, res }) {
   }
 
   // console.log('Print bill body: ', requestBody)
+  return res.status(200).json({ result: signData('Printer done') })
+}
+
+async function kitchenBill ({ decode, res }) {
+  const requestBody = JSON.parse(decode)
+
+  try {
+    for (const bill of requestBody) {
+      const today = new Date()
+      today.setTime(bill.today.getTime() + eigthHoursInMill)
+      bill.today = today.toISOString().replace('T', ' ').slice(0, 19)
+      await sendKitchenPrint(bill)
+    }
+  } catch (err) {
+    logger.log('error', err)
+    // throw err
+    return res.status(200).json({ result: err })
+  }
   return res.status(200).json({ result: signData('Printer done') })
 }
 
@@ -83,6 +102,53 @@ async function sendPrinter (data) {
     PRINTER.printQR(data.title, { cellSize: 8, correction: 'Q', model: 2 })
     // PRINTER.setTextNormal()
     PRINTER.print(data.billType)
+    PRINTER.beep()
+    PRINTER.cut()
+
+    const result = await PRINTER.execute()
+    return result
+  } catch (e) {
+    logger.log('debug', 'Catched ERROR: ' + e)
+    throw e
+  }
+}
+
+async function sendKitchenPrint (data) {
+  logger.log('debug', 'Kitchen bill function called')
+  const printerInterface = '//localhost/' + process.env.PRINTER_INTERFACE || 'SLK-TS400'
+  const PRINTER = new ThermalPrinter({
+    type: PrinterTypes.EPSON, // Printer type: 'star' or 'epson'
+    interface: printerInterface,
+    width: 42,
+    // driver: require('printer'),                   // Printer interface
+    characterSet: CharacterSet.PC866_CYRILLIC2, // Printer character set - default: SLOVENIA
+    removeSpecialCharacters: false, // Removes special characters - default: false
+    breakLine: BreakLine.NONE, // Break line after WORD or CHARACTERS. Disabled with NONE - default: WORD
+    options: { // Additional options
+      timeout: 5000 // Connection timeout (ms) [applicable only for network printers] - default: 3000
+    }
+  })
+
+  console.log('Req: ', data)
+
+  try {
+    PRINTER.clear()
+    PRINTER.bold()
+    PRINTER.alignLeft()
+    PRINTER.println('Ubeats cloud kitchen')
+    PRINTER.println(data.today)
+    PRINTER.drawLine()
+    PRINTER.setTextQuadArea()
+    PRINTER.print(data.kitchen.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'))
+    // PRINTER.println('Bill type: ' + data.address.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'),)
+    PRINTER.println('Хоол авах цаг: ' + data.schedule ? data.schedule : '=')
+    PRINTER.newLine()
+    for (const item of data.items) {
+      PRINTER.leftRight(item.name.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'), item.qty)
+    }
+    PRINTER.drawLine()
+    PRINTER.newLine()
+    PRINTER.println('Бvгд: ' + data.totalItems)
     PRINTER.beep()
     PRINTER.cut()
 
