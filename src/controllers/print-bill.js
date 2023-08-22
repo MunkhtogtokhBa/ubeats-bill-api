@@ -34,7 +34,9 @@ async function kitchenBill ({ decode, res }) {
     for (const bill of requestBody) {
       const today = new Date()
       today.setTime(today.getTime() + eigthHoursInMill)
+      console.log('Today', today)
       bill.today = today.toISOString().replace('T', ' ').slice(0, 19)
+      console.log('Bill', bill)
       await sendKitchenPrint(bill)
     }
   } catch (err) {
@@ -141,7 +143,9 @@ async function sendKitchenPrint (data) {
     PRINTER.setTextQuadArea()
     PRINTER.print(data.kitchen.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'))
     // PRINTER.println('Bill type: ' + data.address.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'),)
-    PRINTER.println('Хоол авах цаг: ' + data.schedule ? data.schedule : '=')
+    PRINTER.newLine()
+    PRINTER.setTextNormal()
+    PRINTER.println('Хоол авах цаг: ' + (data.schedule ? data.schedule : '='))
     PRINTER.newLine()
     for (const item of data.items) {
       PRINTER.leftRight(item.name.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'), item.qty)
