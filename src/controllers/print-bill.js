@@ -117,7 +117,7 @@ async function sendPrinter (data) {
 
 async function sendKitchenPrint (data) {
   logger.log('debug', 'Kitchen bill function called')
-  const printerInterface = '//localhost/' + process.env.PRINTER_INTERFACE || 'SLK-TS400'
+  const printerInterface = '//localhost/' + process.env.KITCHEN_PRINTER_INTERFACE || 'SLK-TS400'
   const PRINTER = new ThermalPrinter({
     type: PrinterTypes.EPSON, // Printer type: 'star' or 'epson'
     interface: printerInterface,
@@ -135,7 +135,6 @@ async function sendKitchenPrint (data) {
 
   try {
     PRINTER.clear()
-    PRINTER.bold()
     PRINTER.alignLeft()
     PRINTER.println('Ubeats cloud kitchen')
     PRINTER.println(data.today)
@@ -147,6 +146,8 @@ async function sendKitchenPrint (data) {
     PRINTER.setTextNormal()
     PRINTER.println('Хоол авах цаг: ' + (data.schedule ? data.schedule : '='))
     PRINTER.newLine()
+    PRINTER.bold(true)
+    PRINTER.setTextDoubleHeight()
     for (const item of data.items) {
       PRINTER.leftRight(item.name.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'), item.qty)
     }
