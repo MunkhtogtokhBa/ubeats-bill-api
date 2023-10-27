@@ -59,10 +59,13 @@ function encodTest (req, res) {
 }
 function secure (req, res, next) {
   const { data } = req.body
-  //   console.log('Req: ', req)
+    console.log('Req: ', req)
   //   const enc = encrypt256ctr(JSON.stringify(body), SIGN_SECRET.slice(0, 32))
   const decode = decrypt256ctr(data, SIGN_SECRET.slice(0, 32))
-  req.decode = JSON.parse(decode)
+  console.log('>>>>>>>>>>', decode)
+  // req.decode = {data: JSON.parse(decode)}
+  req.decode = decode
+  console.log('>>>>>>>>>>', req.decode)
   return next()
 }
 function signData (data) {
