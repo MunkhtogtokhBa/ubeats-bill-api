@@ -1,7 +1,8 @@
 // import { getEncryptionKey } from './common'
 const crypto = require('crypto')
 // mMSiIHAaJoctRbanA19rXmUqWXXqV3M8eaGb9OvQCjk=
-const SIGN_SECRET = process.env.SECRET_KEY || 'mMSiIHAaJoctRbanA19rXmUqWXXqV3M8eaGb9OvQCjk='
+const SIGN_SECRET = process.env.SECRET_KEY || 'dfgdfhfgnhhlksjfdlgdfgksdfgdfgsdfhdfghf'
+console.log('SECREt', SIGN_SECRET)
 const ENCRYPTION_KEY = Buffer.from(SIGN_SECRET.slice(0, 33))
 const ALGORITHM = 'aes-256-ctr'
 const IV_LENGTH = 16
