@@ -19,6 +19,7 @@ async function printBill ({ decode, res }) {
     }
   } catch (err) {
     logger.log('error', err)
+    console.log('error', err)
     // throw err
     return res.status(200).json({ result: err })
   }
@@ -41,6 +42,7 @@ async function kitchenBill ({ decode, res }) {
     }
   } catch (err) {
     logger.log('error', err)
+    console.log('error', err)
     // throw err
     return res.status(200).json({ result: err })
   }
@@ -49,7 +51,7 @@ async function kitchenBill ({ decode, res }) {
 
 async function sendPrinter (data) {
   logger.log('debug', 'Print bill function called')
-  const printerInterface = '//localhost/' + process.env.PRINTER_INTERFACE || 'SLK-TS400'
+  const printerInterface = '//localhost/' + process.env.KITCHEN_PRINTER_INTERFACE || 'SLK-TS400'
   const PRINTER = new ThermalPrinter({
     type: PrinterTypes.EPSON, // Printer type: 'star' or 'epson'
     interface: printerInterface,
@@ -117,6 +119,7 @@ async function sendPrinter (data) {
 
 async function sendKitchenPrint (data) {
   logger.log('debug', 'Kitchen bill function called')
+  console.log('kitchen bill started')
   const printerInterface = '//localhost/' + process.env.KITCHEN_PRINTER_INTERFACE || 'SLK-TS400'
   const PRINTER = new ThermalPrinter({
     type: PrinterTypes.EPSON, // Printer type: 'star' or 'epson'
@@ -131,8 +134,8 @@ async function sendKitchenPrint (data) {
     }
   })
 
-  console.log('Req: ', data)
-
+  console.log('Req shuu: ', data)
+console.log('PRINTER: ',PRINTER)
   try {
     PRINTER.clear()
     PRINTER.alignLeft()
@@ -149,6 +152,7 @@ async function sendKitchenPrint (data) {
     PRINTER.bold(true)
     PRINTER.setTextDoubleHeight()
     for (const item of data.items) {
+      console.log('Item: ', item)
       PRINTER.leftRight(item.name.replace(/Ө/g, 'Є').replace(/ө/g, 'є').replace(/Ү/g, 'V').replace(/ү/g, 'v'), item.qty)
     }
     PRINTER.drawLine()
@@ -156,11 +160,13 @@ async function sendKitchenPrint (data) {
     PRINTER.println('Бvгд: ' + data.totalItems)
     PRINTER.beep()
     PRINTER.cut()
-
+console.log('Finish....')
     const result = await PRINTER.execute()
+    console.log('Finish1111....')
     return result
   } catch (e) {
     logger.log('debug', 'Catched ERROR: ' + e)
+    console.log('debug', 'Catched ERROR: ' + e)
     throw e
   }
 }
